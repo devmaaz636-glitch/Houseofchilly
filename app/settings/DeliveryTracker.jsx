@@ -571,18 +571,13 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet,
   Linking,
   ScrollView,
-  Dimensions,
   Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import deliverytracking from "../../assets/images/deliverytracking.png";
-
-const { width } = Dimensions.get("window");
 
 const DeliveryTracker = () => {
   const router = useRouter();
@@ -657,15 +652,17 @@ const DeliveryTracker = () => {
 
   if (!orderData) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
+      <SafeAreaView className="flex-1 bg-gray-50">
+        <View className="flex-1 justify-center items-center px-10">
           <Ionicons name="alert-circle-outline" size={64} color="#CF2526" />
-          <Text style={styles.errorText}>No order data available</Text>
+          <Text className="text-lg text-gray-600 mt-4 text-center font-medium">
+            No order data available
+          </Text>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.errorButton}
+            className="mt-6 bg-[#CF2526] px-8 py-3 rounded-full shadow-lg"
           >
-            <Text style={styles.errorButtonText}>Go Back</Text>
+            <Text className="text-white font-bold text-base">Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -675,26 +672,26 @@ const DeliveryTracker = () => {
   const currentStatus = getCurrentStatusDetails();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       {/* Fixed Header */}
-      <View style={styles.fixedHeader}>
+      <View className="flex-row items-center justify-between px-5 py-4 bg-white border-b border-gray-100 shadow-sm">
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
         >
           <Ionicons name="chevron-back" size={26} color="#000" />
         </TouchableOpacity>
 
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>Order Tracking</Text>
-          <View className="border-b border-dashed border-gray-300 mt-1" />
+        <View className="items-center flex-1 mx-4">
+          <Text className="text-lg font-bold text-black">Order Tracking</Text>
+          <View className="border-b border-dashed border-gray-300 w-16 mt-1" />
         </View>
 
-        <View style={styles.headerRight} />
+        <View className="w-10" />
       </View>
 
       <Animated.ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -703,53 +700,64 @@ const DeliveryTracker = () => {
         scrollEventThrottle={16}
       >
         {/* Logo */}
-        <View style={styles.logoContainer}>
+        <View className="items-center py-5 bg-white">
           <Image
             source={require("../../assets/images/logo.png")}
-            style={styles.logo}
+            className="w-24 h-14"
             resizeMode="contain"
           />
         </View>
 
         {/* Current Status Card */}
-        <View style={styles.statusCard}>
-          <View style={styles.statusIconContainer}>
-            <View style={styles.statusIconCircle}>
+        <View className="mx-5 mt-5 bg-white rounded-2xl p-6 items-center shadow-md">
+          <View className="mb-4">
+            <View className="w-20 h-20 rounded-full bg-red-50 items-center justify-center border-3 border-[#CF2526]">
               <Ionicons name={currentStatus.icon} size={32} color="#CF2526" />
             </View>
           </View>
-          <Text style={styles.statusCardTitle}>{currentStatus.title}</Text>
-          <Text style={styles.statusCardDescription}>
+          
+          <Text className="text-2xl font-bold text-[#CF2526] mb-2 text-center">
+            {currentStatus.title}
+          </Text>
+          <Text className="text-sm text-gray-600 text-center mb-5">
             {currentStatus.description}
           </Text>
-          <View style={styles.statusCardDivider} />
-          <View style={styles.estimatedTimeContainer}>
-            <Text style={styles.estimatedTimeLabel}>Estimated Arrival</Text>
-            <Text style={styles.estimatedTime}>{getEstimatedTime()}</Text>
+          
+          <View className="h-px w-full bg-gray-100 my-5" />
+          
+          <View className="items-center">
+            <Text className="text-xs text-gray-500 mb-1">Estimated Arrival</Text>
+            <Text className="text-4xl font-extrabold text-[#CF2526]">
+              {getEstimatedTime()}
+            </Text>
           </View>
         </View>
 
         {/* Order Details Card */}
-        <View style={styles.orderDetailsCard}>
-          <Text style={styles.sectionTitle}>Order Details</Text>
+        <View className="mx-5 mt-5 bg-white rounded-2xl p-5 shadow-md">
+          <Text className="text-lg font-bold text-black mb-4">Order Details</Text>
 
-          <View style={styles.detailRow}>
-            <View style={styles.detailIconContainer}>
+          {/* Order ID */}
+          <View className="flex-row mb-4">
+            <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-3">
               <Ionicons name="receipt-outline" size={20} color="#666" />
             </View>
-            <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Order ID</Text>
-              <Text style={styles.detailValue}>#{orderData.id || "N/A"}</Text>
+            <View className="flex-1 justify-center">
+              <Text className="text-xs text-gray-500 mb-1 font-medium">Order ID</Text>
+              <Text className="text-base text-gray-800 font-semibold">
+                #{orderData.id || "N/A"}
+              </Text>
             </View>
           </View>
 
-          <View style={styles.detailRow}>
-            <View style={styles.detailIconContainer}>
+          {/* Order Date */}
+          <View className="flex-row mb-4">
+            <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-3">
               <Ionicons name="calendar-outline" size={20} color="#666" />
             </View>
-            <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Order Date</Text>
-              <Text style={styles.detailValue}>
+            <View className="flex-1 justify-center">
+              <Text className="text-xs text-gray-500 mb-1 font-medium">Order Date</Text>
+              <Text className="text-base text-gray-800 font-semibold leading-5">
                 {new Date(orderData.createdAt).toLocaleDateString("en-US", {
                   weekday: "short",
                   month: "short",
@@ -766,35 +774,42 @@ const DeliveryTracker = () => {
             </View>
           </View>
 
+          {/* Delivery Address */}
           {orderData.deliveryAddress && (
-            <View style={styles.detailRow}>
-              <View style={styles.detailIconContainer}>
+            <View className="flex-row mb-4">
+              <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-3">
                 <Ionicons name="location-outline" size={20} color="#666" />
               </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Delivery Address</Text>
-                <Text style={styles.detailValue}>
+              <View className="flex-1 justify-center">
+                <Text className="text-xs text-gray-500 mb-1 font-medium">
+                  Delivery Address
+                </Text>
+                <Text className="text-base text-gray-800 font-semibold leading-5">
                   {orderData.deliveryAddress}
                 </Text>
               </View>
             </View>
           )}
 
+          {/* Items */}
           {orderData.items && orderData.items.length > 0 && (
-            <View style={styles.detailRow}>
-              <View style={styles.detailIconContainer}>
+            <View className="flex-row mb-4">
+              <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-3">
                 <Ionicons name="cart-outline" size={20} color="#666" />
               </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>
+              <View className="flex-1">
+                <Text className="text-xs text-gray-500 mb-2 font-medium">
                   Items ({orderData.items.length})
                 </Text>
                 {orderData.items.map((item, index) => (
-                  <View key={index} style={styles.itemRow}>
-                    <Text style={styles.itemName}>
+                  <View
+                    key={index}
+                    className="flex-row justify-between py-1.5 pl-3 border-l-2 border-[#CF2526] mt-2"
+                  >
+                    <Text className="text-sm text-gray-800 flex-1">
                       {item.quantity}x {item.name}
                     </Text>
-                    <Text style={styles.itemPrice}>
+                    <Text className="text-sm text-[#CF2526] font-semibold">
                       ${(item.price * item.quantity).toFixed(2)}
                     </Text>
                   </View>
@@ -803,95 +818,89 @@ const DeliveryTracker = () => {
             </View>
           )}
 
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total Amount</Text>
-            <Text style={styles.totalValue}>
-              ${orderData.totalAmount?.toFixed(2) || "0.00"}
+          {/* Total Amount */}
+          <View className="flex-row justify-between pt-4 mt-4 border-t border-gray-100">
+            <Text className="text-base font-bold text-black">Total Amount</Text>
+            <Text className="text-lg font-bold text-black">
+              Rs. {orderData.totalAmount?.toFixed(2) || "0.00"}
             </Text>
           </View>
         </View>
 
         {/* Delivery Progress Section */}
-        <View style={styles.progressSection}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.sectionTitle}>Delivery Progress</Text>
-            <View style={styles.deliveryServiceBadge}>
+        <View className="mx-5 mt-5 bg-white rounded-2xl p-5 shadow-md">
+          <View className="flex-row justify-between items-center mb-6">
+            <Text className="text-lg font-bold text-black">Delivery Progress</Text>
+            <View className="flex-row items-center bg-red-50 px-3 py-1.5 rounded-xl">
               <Ionicons name="bicycle" size={14} color="#CF2526" />
-              <Text style={styles.deliveryServiceText}>
+              <Text className="text-xs text-[#CF2526] font-semibold ml-1">
                 {orderData.deliveryService || "Express Delivery"}
               </Text>
             </View>
           </View>
 
           {/* Vertical Progress Timeline */}
-          <View style={styles.timelineContainer}>
+          <View className="pl-2.5">
             {steps.map((step, index) => {
               const isCompleted = index <= statusIndex;
               const isActive = index === statusIndex;
 
               return (
-                <View key={index} style={styles.timelineItem}>
+                <View key={index} className="flex-row pb-8 relative">
                   {/* Timeline Line */}
                   {index < steps.length - 1 && (
                     <View
-                      style={[
-                        styles.timelineLine,
-                        isCompleted && styles.timelineLineActive,
-                      ]}
+                      className={`absolute left-[21px] top-8 bottom-[-8px] w-0.5 ${
+                        isCompleted ? "bg-[#CF2526]" : "bg-gray-200"
+                      }`}
                     />
                   )}
 
                   {/* Timeline Node */}
-                  <View style={styles.timelineNodeContainer}>
+                  <View className="w-11 items-center pt-0.5">
                     <View
-                      style={[
-                        styles.timelineNode,
-                        isCompleted && styles.timelineNodeActive,
-                        isActive && styles.timelineNodeCurrent,
-                      ]}
+                      className={`w-6 h-6 rounded-full border-2 bg-white items-center justify-center ${
+                        isCompleted
+                          ? "border-[#CF2526] bg-[#CF2526]"
+                          : "border-gray-200"
+                      } ${isActive ? "border-3 w-7 h-7" : ""}`}
                     >
                       {isCompleted ? (
                         isActive ? (
-                          <View style={styles.timelineNodeInner} />
+                          <View className="w-3 h-3 rounded-full bg-white" />
                         ) : (
-                          <Ionicons
-                            name="checkmark"
-                            size={16}
-                            color="#FFFFFF"
-                          />
+                          <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                         )
                       ) : null}
                     </View>
                   </View>
 
                   {/* Timeline Content */}
-                  <View style={styles.timelineContent}>
-                    <View style={styles.timelineHeader}>
+                  <View className="flex-1 pt-0">
+                    <View className="flex-row items-center mb-1">
                       <Ionicons
                         name={step.icon}
                         size={20}
                         color={isCompleted ? "#CF2526" : "#999"}
                       />
                       <Text
-                        style={[
-                          styles.timelineTitle,
-                          isCompleted && styles.timelineTitleActive,
-                        ]}
+                        className={`text-base font-semibold ml-2 ${
+                          isCompleted ? "text-black" : "text-gray-400"
+                        }`}
                       >
                         {step.label}
                       </Text>
                     </View>
                     <Text
-                      style={[
-                        styles.timelineDescription,
-                        isCompleted && styles.timelineDescriptionActive,
-                      ]}
+                      className={`text-xs ml-7 ${
+                        isCompleted ? "text-gray-600" : "text-gray-400"
+                      }`}
                     >
                       {step.description}
                     </Text>
                     {orderData.trackingHistory &&
                       orderData.trackingHistory[index] && (
-                        <Text style={styles.timelineTimestamp}>
+                        <Text className="text-xs text-[#CF2526] ml-7 mt-1 font-medium">
                           {new Date(
                             orderData.trackingHistory[index].timestamp
                           ).toLocaleTimeString([], {
@@ -908,25 +917,31 @@ const DeliveryTracker = () => {
           </View>
         </View>
 
-        {/* Rider Information (if available) */}
+        {/* Rider Information */}
         {orderData.riderName && statusIndex >= 1 && statusIndex < 3 && (
-          <View style={styles.riderCard}>
-            <Text style={styles.sectionTitle}>Delivery Partner</Text>
-            <View style={styles.riderInfo}>
-              <View style={styles.riderAvatar}>
+          <View className="mx-5 mt-5 bg-white rounded-2xl p-5 shadow-md">
+            <Text className="text-lg font-bold text-black mb-4">
+              Delivery Partner
+            </Text>
+            <View className="flex-row items-center">
+              <View className="w-14 h-14 rounded-full bg-red-50 items-center justify-center mr-3">
                 <Ionicons name="person" size={32} color="#CF2526" />
               </View>
-              <View style={styles.riderDetails}>
-                <Text style={styles.riderName}>{orderData.riderName}</Text>
-                <View style={styles.riderRating}>
+              <View className="flex-1">
+                <Text className="text-base font-bold text-black mb-1">
+                  {orderData.riderName}
+                </Text>
+                <View className="flex-row items-center">
                   <Ionicons name="star" size={14} color="#FFD700" />
-                  <Text style={styles.riderRatingText}>4.8</Text>
+                  <Text className="text-sm text-gray-600 ml-1 font-semibold">
+                    4.8
+                  </Text>
                 </View>
               </View>
               {orderData.riderPhone && (
                 <TouchableOpacity
                   onPress={() => Linking.openURL(`tel:${orderData.riderPhone}`)}
-                  style={styles.callButton}
+                  className="w-11 h-11 rounded-full bg-[#CF2526] items-center justify-center shadow-lg"
                 >
                   <Ionicons name="call" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
@@ -935,43 +950,47 @@ const DeliveryTracker = () => {
           </View>
         )}
 
-        {/* Delivery Image Section (for delivered orders) */}
+        {/* Delivery Proof */}
         {statusIndex === 3 && orderData.deliveryProof && (
-          <View style={styles.proofCard}>
-            <Text style={styles.sectionTitle}>Delivery Proof</Text>
+          <View className="mx-5 mt-5 bg-white rounded-2xl p-5 shadow-md">
+            <Text className="text-lg font-bold text-black mb-4">
+              Delivery Proof
+            </Text>
             <Image
               source={{ uri: orderData.deliveryProof }}
-              style={styles.proofImage}
+              className="w-full h-48 rounded-xl mb-3"
               resizeMode="cover"
             />
-            <Text style={styles.proofText}>
+            <Text className="text-sm text-gray-600 text-center">
               Package delivered successfully at your doorstep
             </Text>
           </View>
         )}
 
         {/* Bottom Section */}
-        <View style={styles.bottomSection}>
-          {/* Thank You Button */}
+        <View className="mt-5 px-5 pb-8">
+          {/* Primary Action Button */}
           {statusIndex === 3 ? (
             <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => {
-                // Navigate to rate order or home
-                router.push("/");
-              }}
+              className="bg-[#CF2526] rounded-full py-4 items-center justify-center flex-row shadow-lg"
+              onPress={() => router.push("/")}
             >
               <Ionicons
                 name="checkmark-circle"
                 size={20}
                 color="#FFFFFF"
-                style={styles.buttonIcon}
+                style={{ marginRight: 8 }}
               />
-              <Text style={styles.primaryButtonText}>Rate Your Order</Text>
+              <Text className="text-white font-bold text-base">
+                Rate Your Order
+              </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
-              <Text style={styles.primaryButtonText}>
+            <TouchableOpacity
+              className="bg-[#CF2526] rounded-full py-4 items-center justify-center shadow-lg"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white font-bold text-base">
                 {statusIndex === 0 && "Preparing your order..."}
                 {statusIndex === 1 && "Order picked up"}
                 {statusIndex === 2 && "On the way to you"}
@@ -986,40 +1005,40 @@ const DeliveryTracker = () => {
                 "https://api.whatsapp.com/send/?phone=923318555546&text&type=phone_number&app_absent=0"
               )
             }
-            style={styles.whatsappContainer}
+            className="flex-row items-center justify-between mt-4 py-4 px-5 bg-white rounded-xl border border-gray-100"
             activeOpacity={0.7}
           >
-            <View style={styles.whatsappContent}>
-              <Ionicons
-                name="logo-whatsapp"
-                size={20}
-                color="#25D366"
-                style={styles.whatsappIcon}
-              />
+            <View className="flex-row items-center flex-1">
               <View>
-                <Text style={styles.whatsappText}>
-                  <Text style={styles.whatsappTextBold}>Need Help?</Text>
-                  <Text style={styles.whatsappTextRegular}>
-                    {" "}
-                    Chat on WhatsApp
+                <View className="flex-row items-center">
+                  <Text className="text-sm">
+                    <Text className="text-[#CF2526] font-semibold">Need Help?</Text>
+                    <Text className="text-gray-600"> Chat on WhatsApp</Text>
                   </Text>
-                </Text>
-                <View style={styles.whatsappUnderline} />
+                  <Ionicons
+                    name="logo-whatsapp"
+                    size={18}
+                    color="#25D366"
+                    style={{ marginLeft: 6 }}
+                  />
+                </View>
+                <View className="h-px bg-[#CF2526] w-full mt-0.5" />
               </View>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#666" />
           </TouchableOpacity>
 
-          {/* Cancel Order Button (only for pending status) */}
+          {/* Cancel Order Button */}
           {statusIndex === 0 && (
             <TouchableOpacity
-              style={styles.cancelButton}
+              className="mt-3 py-3.5 items-center rounded-xl border border-red-600"
               onPress={() => {
-                // Handle order cancellation
                 console.log("Cancel order");
               }}
             >
-              <Text style={styles.cancelButtonText}>Cancel Order</Text>
+              <Text className="text-red-600 font-semibold text-base">
+                Cancel Order
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -1027,502 +1046,5 @@ const DeliveryTracker = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
-  },
-  fixedHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    zIndex: 1000,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#F8F9FA",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitleContainer: {
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  headerUnderline: {
-    height: 2,
-    width: 60,
-    backgroundColor: "#CF2526",
-    marginTop: 4,
-  },
-  headerRight: {
-    width: 40,
-  },
-  scrollContent: {
-    paddingBottom: 30,
-  },
-  // Logo
-  logoContainer: {
-    alignItems: "center",
-    paddingVertical: 20,
-    backgroundColor: "#FFFFFF",
-  },
-  logo: {
-    width: 100,
-    height: 60,
-  },
-  // Status Card
-  statusCard: {
-    marginHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  statusIconContainer: {
-    marginBottom: 16,
-  },
-  statusIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#FFF5F5",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#CF2526",
-  },
-  statusCardTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#CF2526",
-    marginBottom: 8,
-  },
-  statusCardDescription: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-  },
-  statusCardDivider: {
-    height: 1,
-    width: "100%",
-    backgroundColor: "#F0F0F0",
-    marginVertical: 20,
-  },
-  estimatedTimeContainer: {
-    alignItems: "center",
-  },
-  estimatedTimeLabel: {
-    fontSize: 13,
-    color: "#999",
-    marginBottom: 4,
-  },
-  estimatedTime: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#CF2526",
-  },
-  // Order Details Card
-  orderDetailsCard: {
-    marginHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: "row",
-    marginBottom: 16,
-  },
-  detailIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F8F9FA",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  detailContent: {
-    flex: 1,
-  },
-  detailLabel: {
-    fontSize: 13,
-    color: "#999",
-    marginBottom: 4,
-    fontWeight: "500",
-  },
-  detailValue: {
-    fontSize: 15,
-    color: "#333",
-    fontWeight: "600",
-    lineHeight: 20,
-  },
-  itemRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
-    paddingLeft: 12,
-    borderLeftWidth: 2,
-    borderLeftColor: "#CF2526",
-    marginTop: 8,
-  },
-  itemName: {
-    fontSize: 14,
-    color: "#333",
-    flex: 1,
-  },
-  itemPrice: {
-    fontSize: 14,
-    color: "#CF2526",
-    fontWeight: "600",
-  },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingTop: 16,
-    marginTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#CF2526",
-  },
-  // Progress Section
-  progressSection: {
-    marginHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  progressHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  deliveryServiceBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFF5F5",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  deliveryServiceText: {
-    fontSize: 12,
-    color: "#CF2526",
-    fontWeight: "600",
-    marginLeft: 4,
-  },
-  // Timeline
-  timelineContainer: {
-    paddingLeft: 10,
-  },
-  timelineItem: {
-    flexDirection: "row",
-    paddingBottom: 32,
-    position: "relative",
-  },
-  timelineLine: {
-    position: "absolute",
-    left: 21,
-    top: 32,
-    bottom: -8,
-    width: 2,
-    backgroundColor: "#E5E5E5",
-  },
-  timelineLineActive: {
-    backgroundColor: "#CF2526",
-  },
-  timelineNodeContainer: {
-    width: 44,
-    alignItems: "center",
-    paddingTop: 2,
-  },
-  timelineNode: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#E5E5E5",
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  timelineNodeActive: {
-    borderColor: "#CF2526",
-    backgroundColor: "#CF2526",
-  },
-  timelineNodeCurrent: {
-    borderWidth: 3,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-  },
-  timelineNodeInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#FFFFFF",
-  },
-  timelineContent: {
-    flex: 1,
-    paddingTop: 0,
-  },
-  timelineHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  timelineTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#999",
-    marginLeft: 8,
-  },
-  timelineTitleActive: {
-    color: "#000",
-  },
-  timelineDescription: {
-    fontSize: 13,
-    color: "#999",
-    marginLeft: 28,
-  },
-  timelineDescriptionActive: {
-    color: "#666",
-  },
-  timelineTimestamp: {
-    fontSize: 12,
-    color: "#CF2526",
-    marginLeft: 28,
-    marginTop: 4,
-    fontWeight: "500",
-  },
-  // Rider Card
-  riderCard: {
-    marginHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  riderInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  riderAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#FFF5F5",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  riderDetails: {
-    flex: 1,
-  },
-  riderName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 4,
-  },
-  riderRating: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  riderRatingText: {
-    fontSize: 14,
-    color: "#666",
-    marginLeft: 4,
-    fontWeight: "600",
-  },
-  callButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#CF2526",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  // Delivery Proof
-  proofCard: {
-    marginHorizontal: 20,
-    marginTop: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  proofImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  proofText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-  },
-  // Bottom Section
-  bottomSection: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-  primaryButton: {
-    backgroundColor: "#CF2526",
-    borderRadius: 25,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    shadowColor: "#CF2526",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  buttonIcon: {
-    marginRight: 8,
-  },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  whatsappContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#F0F0F0",
-  },
-  whatsappContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  whatsappIcon: {
-    marginRight: 12,
-  },
-  whatsappText: {
-    fontSize: 14,
-  },
-  whatsappTextBold: {
-    color: "#CF2526",
-    fontWeight: "600",
-  },
-  whatsappTextRegular: {
-    color: "#666",
-  },
-  whatsappUnderline: {
-    height: 1,
-    backgroundColor: "#CF2526",
-    width: "100%",
-    marginTop: 2,
-  },
-  cancelButton: {
-    marginTop: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#DC143C",
-  },
-  cancelButtonText: {
-    color: "#DC143C",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  // Error State
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 40,
-  },
-  errorText: {
-    fontSize: 18,
-    color: "#666",
-    marginTop: 16,
-    textAlign: "center",
-  },
-  errorButton: {
-    marginTop: 24,
-    backgroundColor: "#CF2526",
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  errorButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});
 
 export default DeliveryTracker;

@@ -170,13 +170,23 @@ const EditProfile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Header */}
-      <View className="px-4 pt-4 pb-2 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <Ionicons name="arrow-back" size={24} color="#666666" />
-        </TouchableOpacity>
-        <Text className="text-gray-900 text-2xl font-bold">Edit Profile</Text>
-      </View>
+      
+   <View className="px-4 pt-4 pb-2 flex-row items-center relative border-b border-dashed border-gray-300">
+
+  <TouchableOpacity 
+    className="mr-3 bg-white p-2 rounded-full shadow-md" 
+    onPress={() => router.back()}
+  >
+    <Ionicons name="chevron-back" size={24} color="#666666" />
+  </TouchableOpacity>
+
+ 
+  <View className="flex-1 items-center justify-center">
+    <Text className="text-gray-900 text-2xl font-bold text-center">
+      Edit Profile
+    </Text>
+  </View>
+</View>
 
       <ScrollView className="flex-1">
         <View className="px-4 py-4">

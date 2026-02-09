@@ -129,17 +129,21 @@ const HelpSupport = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#FFFFFF]">
       {/* HEADER */}
-      <View className="px-4 pt-4 pb-2 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <Ionicons name="arrow-back" size={24} color="#000000" />
+      <View className="px-4 pt-4 pb-2 flex-row items-center relative border-b border-dashed border-gray-300">
+        <TouchableOpacity onPress={() => router.back()} className="mr-3 bg-white p-2 rounded-full shadow-md">
+          <Ionicons name="chevron-back" size={24} color="#000000" />
         </TouchableOpacity>
-        <Text className="text-[#000000] text-2xl font-bold">Help & Support</Text>
+       <View className="flex-1 items-center justify-center">
+           <Text className="text-gray-900 text-2xl font-bold text-center">
+             Help & Support
+           </Text>
+         </View>
       </View>
 
       <ScrollView className="flex-1">
         {/* Contact Methods */}
         <View className="px-4 py-4">
-          <Text className="text-[#666666] text-sm font-semibold mb-3">
+          <Text className="text-[#666666] text-sm font-semibold mb-3 text-center">
             CONTACT US
           </Text>
           {contactMethods.map((method, index) => (

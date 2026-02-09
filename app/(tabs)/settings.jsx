@@ -179,7 +179,7 @@ const Settings = () => {
            iconColor="#CF2526"  
           title="My Orders"
           subtitle="View your order history"
-          onPress={() => router.push("/orders")}
+          onPress={() => router.push("/settings/Myorders")}
           rightElement={<Ionicons name="chevron-forward" size={20} color="#000" />}
         />
 
@@ -222,7 +222,7 @@ const Settings = () => {
         {/* Sign Out as a card */}
         <SettingItem
           icon="log-out-outline"
-           iconColor="#CF2526"  
+           iconColor="#CF2526" 
           title="Sign Out"
           rightElement={<Ionicons name="chevron-forward" size={20} color="#000" />}
           subtitle=""

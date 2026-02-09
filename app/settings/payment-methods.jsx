@@ -60,7 +60,7 @@ const PaymentMethods = () => {
       <SafeAreaView className="bg-white">
         {/* Header */}
         <View 
-          className="px-4 flex-row items-center justify-center relative"
+          className="px-4 flex-row items-center justify-center relative border-b border-dashed border-gray-300 "
           style={{
             paddingTop: Platform.OS === 'android' ? 16 : 8,
             paddingBottom: 16,
@@ -75,10 +75,10 @@ const PaymentMethods = () => {
               top: Platform.OS === 'android' ? 16 : 8,
             }}
           >
-            <Ionicons name="arrow-back" size={24} color="#666" />
+            <Ionicons name="chevron-back" size={24} color="#666" className="bg-white shadow-md rounded-full"/>
           </TouchableOpacity>
 
-          <Text className="text-gray-900 text-xl font-bold">
+          <Text className="text-gray-900 text-xl font-bold ">
             Payment Methods
           </Text>
         </View>

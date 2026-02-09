@@ -243,7 +243,7 @@ const SavedAddresses = () => {
                 placeholderTextColor="#888"
                 value={formData[field] || ""}
                 onChangeText={(t) => setFormData({ ...formData, [field]: t })}
-                className="bg-white text-gray-900 p-4 rounded-xl mb-3 shadow-sm border border-gray-200"
+                className="bg-white text-gray-900 p-4 rounded-xl mb-3 shadow-sm border-b border-dashed border-gray-200"
               />
             ))}
 
