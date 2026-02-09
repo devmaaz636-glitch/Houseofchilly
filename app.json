@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "House Of Chilly",
+    "name": "House Of Chilly Mobile App",
     "slug": "house-of-chilly",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,9 +9,22 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.muhammadmaazkhan.houseofchilly",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "dinetime"
+            ]
+          }
+        ],
+        "NSUserNotificationUsageDescription": "We use notifications to update you about your order status and delivery progress."
+      }
     },
     "android": {
+      "package": "com.muhammadmaazkhan.houseofchilly",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -19,7 +32,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "NOTIFICATIONS"
+      ],
+      "notification": {
+        "icon": "./assets/images/notification-icon.png",
+        "color": "#CF2526"
+      }
     },
     "web": {
       "output": "static",
@@ -42,17 +62,14 @@
       "@react-native-community/datetimepicker",
       "expo-font",
       "expo-web-browser",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-notifications",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "f4469b4a-67db-4854-9a82-046e4a3cef66"
-      }
     }
   }
 }

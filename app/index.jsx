@@ -24,7 +24,7 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1"> 
       <StatusBar barStyle="light-content" />
 
       <ImageBackground source={bgHome} className="flex-1" resizeMode="cover">

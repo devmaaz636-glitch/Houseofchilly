@@ -279,8 +279,8 @@ const Signup = () => {
   style={{
     fontFamily: Fonts.Shrikhand,
     fontWeight: "600",
-    lineHeight: 28,       // match 100% of font-size
-    letterSpacing: -0.56, // -2% of 28px ≈ -0.56px
+    lineHeight: 28,       
+    letterSpacing: -0.56, 
     textAlignVertical: "bottom",
     color: "#D42129",
   }}

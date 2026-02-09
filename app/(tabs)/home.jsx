@@ -1,3 +1,4 @@
+
 import {
   View,
   Text,
@@ -9,9 +10,11 @@ import {
   TouchableOpacity,
   ImageBackground,
   Dimensions,
+  Modal,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Animatable from "react-native-animatable";
 import { collection, getDocs, query } from "firebase/firestore";
@@ -27,17 +30,14 @@ import deliveryicon from "../../assets/images/deliveryicon.png";
 import homesubimage from "../../assets/images/homesubimage.png";
 import homehandisubimage from "../../assets/images/homehandisubimage.png";
 import homerollsubimage from "../../assets/images/homerollsubimage.png";
-import bestselller1 from "../../assets/images/bestselller1.png";
-import bestselller2 from "../../assets/images/bestselller2.png";
-import bestselller3 from "../../assets/images/bestselller3.png";
-import bestselller4 from "../../assets/images/bestselller4.png";
+
 import { Fonts } from "../../constants/Typography";
 
 const { width: screenWidth } = Dimensions.get("window");
 const bannerWidth = screenWidth - 32;
 const bannerHeight = (bannerWidth * 160) / 350;
 
-// Define carousel banners with different images
+// Define carousel banners
 const carouselBanners = [
   {
     id: 1,
@@ -49,7 +49,7 @@ const carouselBanners = [
   },
   {
     id: 2,
-    image: require("../../assets/images/home1.png"), 
+    image: home1,
     subImage: homehandisubimage,
     discount: "30",
     title: "Special Karachi",
@@ -57,39 +57,11 @@ const carouselBanners = [
   },
   {
     id: 3,
-    image: require("../../assets/images/home1.png"), 
+    image: home1,
     subImage: homerollsubimage,
     discount: "40",
     title: "Hot & Crispy",
     subtitle: "fried chicken"
-  }
-];
-
-// Best Seller static items - Using actual menu item IDs for proper routing
-const bestSellerItems = [
-  {
-    id: 'burger-1',
-    name: 'Chicken Burger',
-    price: '450',
-    image: bestselller1
-  },
-  {
-    id: 'sandwich-1',
-    name: 'Zinger Burger',
-    price: '550',
-    image: bestselller2
-  },
-  {
-    id: 'burger-2',
-    name: 'Beef Burger',
-    price: '600',
-    image: bestselller3
-  },
-  {
-    id: 'bun-kebab-double-decker',
-    name: 'Special Roll',
-    price: '400',
-    image: bestselller4
   }
 ];
 
@@ -101,6 +73,8 @@ export default function Home() {
   const [menuItemsData, setMenuItemsData] = useState(menuItems);
   const [loading, setLoading] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+  const [menuDrawerVisible, setMenuDrawerVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
 
   // Auto-scroll carousel
   useEffect(() => {
@@ -143,212 +117,262 @@ export default function Home() {
     }
   };
 
-  const filteredMenuItems = selectedCategory === 'all' 
-    ? menuItemsData 
-    : menuItemsData.filter(item => item.category === selectedCategory);
+  // Get filtered items based on category
+  const getFilteredItems = () => {
+    if (selectedCategory === 'all') {
+      return menuItemsData;
+    }
+    return menuItemsData.filter(item => item.category === selectedCategory);
+  };
+
+  // Group items by category for "all" view
+  const getGroupedItemsByCategory = () => {
+    const grouped = {};
+    
+    // Get categories that have items (excluding 'all')
+    const categoriesWithItems = categories.filter(cat => cat.id !== 'all');
+    
+    categoriesWithItems.forEach(category => {
+      const itemsInCategory = menuItemsData.filter(
+        item => item.category === category.id
+      );
+      
+      // Only include category if it has items
+      if (itemsInCategory.length > 0) {
+        grouped[category.id] = {
+          name: category.name,
+          items: itemsInCategory.slice(0, 4) // Take first 4 items
+        };
+      }
+    });
+    
+    return grouped;
+  };
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
     setAnimationKey(prev => prev + 1);
+    setMenuDrawerVisible(false);
+  };
+
+  // Menu Drawer Functions
+  const openMenuDrawer = () => {
+    setMenuDrawerVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeMenuDrawer = () => {
+    Animated.timing(slideAnim, {
+      toValue: screenWidth,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setMenuDrawerVisible(false);
+    });
   };
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       onPress={() => handleCategoryChange(item.id)}
-      className={`px-4 py-2 mx-2 rounded-full min-w-[80px] items-center justify-center ${
+      className={`px-5 py-2.5 mx-2 rounded-full min-w-[90px] items-center justify-center ${
         selectedCategory === item.id 
           ? 'bg-red-600' 
-          : 'bg-white'
+          : 'bg-white border border-gray-200'
       }`}
     >
       <Text
         className={`font-bold text-[13px] ${
           selectedCategory === item.id 
             ? 'text-white' 
-            : 'text-black'
+            : 'text-gray-700'
         }`}
+        style={{ fontFamily: Fonts.Poppins.SemiBold }}
       >
         {item.name}
       </Text>
     </TouchableOpacity>
   );
 
-  // Get first 3 items for the featured layout
-  const featuredItems = filteredMenuItems.slice(0, 3);
+  // Render menu item card
+  const renderMenuItem = (item, index, cardWidth) => (
+    <Animatable.View
+      key={item.id}
+      animation="fadeInUp"
+      duration={400}
+      delay={index * 50}
+      style={{ width: cardWidth }}
+    >
+      <TouchableOpacity
+        onPress={() => router.push(`/menu/${item.id}`)}
+        activeOpacity={0.9}
+        className="bg-white rounded-2xl overflow-hidden"
+        style={{
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.08,
+          shadowRadius: 3,
+          elevation: 2,
+        }}
+      >
+        <View className="p-4">
+          {/* Item Name */}
+          <Text
+            style={{
+              fontFamily: Fonts.Poppins.SemiBold,
+              fontWeight: '600',
+              fontSize: 14,
+              lineHeight: 18,
+              color: '#000000',
+              textAlign: 'center',
+              marginBottom: 6,
+            }}
+            numberOfLines={2}
+          >
+            {item.name}
+          </Text>
 
-  const renderFeaturedLayout = () => {
-    if (featuredItems.length === 0) return null;
+          {/* Price */}
+          <Text
+            className="text-center text-[14px] font-semibold text-[#D42129] bg-[#D421291A] rounded-full px-3 py-[2px] self-center mb-3"
+            style={{ fontFamily: Fonts.Poppins.SemiBold }}
+          >
+            Rs. {item.price}
+          </Text>
 
-    const leftItem = featuredItems[0];
-    const topRightItem = featuredItems[1];
-    const bottomRightItem = featuredItems[2];
+          {/* Image */}
+          <View 
+            className="items-center justify-center mb-4"
+            style={{
+              width: '100%',
+              height: cardWidth * 0.75,
+            }}
+          >
+            <Image
+              source={item.image || logo}
+              style={{ 
+                width: '90%', 
+                height: '90%',
+              }}
+              resizeMode="contain"
+            />
+          </View>
+
+          {/* Order Button */}
+          <TouchableOpacity
+            className="bg-red-600 py-2.5 rounded-full"
+            onPress={(e) => {
+              e.stopPropagation();
+              router.push(`/menu/${item.id}`);
+            }}
+            activeOpacity={0.8}
+            style={{
+              shadowColor: '#D42129',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 3,
+              elevation: 3,
+            }}
+          >
+            <Text
+              className="text-white font-bold text-sm text-center uppercase"
+              style={{ 
+                fontFamily: Fonts.Poppins.SemiBold,
+                letterSpacing: 0.5,
+              }}
+            >
+              ORDER NOW
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Animatable.View>
+  );
+
+  // Render menu grid for specific category
+  const renderCategoryMenuGrid = () => {
+    const cardWidth = (screenWidth - 48) / 2;
+    const filteredItems = getFilteredItems();
 
     return (
       <Animatable.View
-        key={`featured-layout-${animationKey}`}
+        key={`menu-grid-${animationKey}`}
         animation="fadeIn"
         duration={500}
-        className="px-4 mb-4"
+        className="px-4 mb-6"
       >
-        <View className="flex-row gap-3 h-[320px]">
-          {/* Left Side - Large Card */}
-          <TouchableOpacity
-            onPress={() => router.push(`/menu/${leftItem.id}`)}
-            className="rounded-2xl overflow-hidden"
-            style={{ flex: 1.1 }}
-            activeOpacity={0.9}
-          >
-            <ImageBackground
-              source={leftItem.image || logo}
-              className="w-full h-full"
-              resizeMode="cover"
-            >
-              <View className="absolute inset-0 bg-black/40" />
-              <View className="flex-1 justify-end p-4">
-                <Text
-                  className="text-white text-xl font-bold mb-2"
-                  style={{ fontFamily: Fonts.Urbanist.Medium }}
-                  numberOfLines={2}
-                >
-                  {leftItem.name}
-                </Text>
-                <TouchableOpacity
-                  className="bg-red-600 px-5 py-2 rounded-full self-start"
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    router.push(`/menu/${leftItem.id}`);
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    className="text-white font-bold text-sm"
-                    style={{ fontFamily: Fonts.Urbanist.Medium }}
-                  >
-                    ORDER NOW
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
-
-          {/* Right Side - Two Stacked Cards */}
-          <View className="flex-1 gap-3">
-            {/* Top Right Card */}
-            {topRightItem && (
-              <TouchableOpacity
-                onPress={() => router.push(`/menu/${topRightItem.id}`)}
-                className="rounded-2xl overflow-hidden flex-1"
-                activeOpacity={0.9}
-              >
-                <ImageBackground
-                  source={topRightItem.image || logo}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                >
-                  <View className="absolute inset-0 bg-black/40" />
-                  <View className="flex-1 justify-end p-3">
-                    <Text
-                      className="text-white text-base font-bold mb-1"
-                      style={{ fontFamily: Fonts.Urbanist.Medium }}
-                      numberOfLines={1}
-                    >
-                      {topRightItem.name}
-                    </Text>
-                    <TouchableOpacity
-                      className="bg-red-600 px-5 py-2 rounded-full self-start"
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        router.push(`/menu/${topRightItem.id}`);
-                      }}
-                      activeOpacity={0.8}
-                    >
-                      <Text
-                        className="text-white font-bold text-sm"
-                        style={{ fontFamily: Fonts.Urbanist.Medium }}
-                      >
-                        ORDER NOW
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
-
-            {/* Bottom Right Card */}
-            {bottomRightItem && (
-              <TouchableOpacity
-                onPress={() => router.push(`/menu/${bottomRightItem.id}`)}
-                className="rounded-2xl overflow-hidden flex-1"
-                activeOpacity={0.9}
-              >
-                <ImageBackground
-                  source={bottomRightItem.image || logo}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                >
-                  <View className="absolute inset-0 bg-black/40" />
-                  <View className="flex-1 justify-end p-3">
-                    <Text
-                      className="text-white text-base font-bold mb-1"
-                      style={{ fontFamily: Fonts.Urbanist.Medium }}
-                      numberOfLines={1}
-                    >
-                      {bottomRightItem.name}
-                    </Text>
-                    <TouchableOpacity
-                      className="bg-red-600 px-5 py-2 rounded-full self-start"
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        router.push(`/menu/${bottomRightItem.id}`);
-                      }}
-                      activeOpacity={0.8}
-                    >
-                      <Text
-                        className="text-white font-bold text-sm"
-                        style={{ fontFamily: Fonts.Urbanist.Medium }}
-                      >
-                        ORDER NOW
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
-          </View>
+        <View className="flex-row flex-wrap" style={{ gap: 16 }}>
+          {filteredItems.map((item, index) => 
+            renderMenuItem(item, index, cardWidth)
+          )}
         </View>
+
+        {/* Empty State */}
+        {filteredItems.length === 0 && (
+          <View className="py-12 items-center">
+            <Text
+              className="text-gray-400 text-base"
+              style={{ fontFamily: Fonts.Poppins.Medium }}
+            >
+              No items in this category
+            </Text>
+          </View>
+        )}
       </Animatable.View>
     );
   };
 
- 
-  const renderBestSellerItems = () => {
+  // Render all categories with 4 items each
+  const renderAllCategoriesView = () => {
     const cardWidth = (screenWidth - 48) / 2;
+    const groupedItems = getGroupedItemsByCategory();
+    const categoryKeys = Object.keys(groupedItems);
+
+    if (categoryKeys.length === 0) {
+      return (
+        <View className="py-12 items-center px-4">
+          <Text
+            className="text-gray-400 text-base"
+            style={{ fontFamily: Fonts.Poppins.Medium }}
+          >
+            No items available
+          </Text>
+        </View>
+      );
+    }
 
     return (
-      <View className="px-4 mb-6">
-        <View className="flex-row flex-wrap" style={{ gap: 16 }}>
-          {bestSellerItems.map((item, index) => (
-            <Animatable.View
-              key={item.id}
-              animation="fadeIn"
-              duration={400}
-              delay={index * 50}
-              style={{ width: cardWidth }}
-            >
-              <View
-                className="bg-white rounded-2xl overflow-hidden"
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#F34046',
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 3,
-                }}
-              >
-                <View className="p-3">
-                  {/* Name */}
+      <Animatable.View
+        key={`all-categories-${animationKey}`}
+        animation="fadeIn"
+        duration={500}
+        className="mb-6"
+      >
+        {categoryKeys.map((categoryId, categoryIndex) => {
+          const categoryData = groupedItems[categoryId];
+          
+          return (
+            <View key={categoryId} className="mb-8">
+              {/* Category Header */}
+              <View className="px-4 mb-4 flex-row items-center justify-between">
+                <View>
+                  <Text
+                    className="text-xl font-bold italic"
+                    style={{ fontFamily: Fonts.Shrikhand, color: "#1F2937" }}
+                  >
+                    {categoryData.name}
+                  </Text>
+                  <View className="mt-1 w-16 h-[3px] bg-[#CF2526] rounded-full" />
+                </View>
+                
+                {/* See All Button */}
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPress={() => handleCategoryChange(categoryId)}
+                >
                   <Text
                     style={{
                       fontFamily: Fonts.Poppins.SemiBold,
@@ -357,71 +381,35 @@ export default function Home() {
                       lineHeight: 12,
                       letterSpacing: -0.24,
                       textAlign: 'center',
-                      color: '#000000',
-                      marginBottom: 4,
-                    }}
-                    numberOfLines={1}
-                  >
-                    {item.name}
-                  </Text>
-
-                  {/* Price */}
-                  <Text
-                    style={{
-                      fontFamily: Fonts.Poppins.SemiBold,
-                      fontWeight: '600',
-                      fontSize: 12,
-                      lineHeight: 12,
-                      textAlign: 'center',
                       color: '#D42129',
-                      marginBottom: 8,
                     }}
                   >
-                    Rs. {item.price}
+                    See All
                   </Text>
-
-                  {/* Image */}
-                  <View 
-                    className="rounded-xl overflow-hidden mb-3 items-center justify-center"
-                    style={{
-                      width: '100%',
-                      aspectRatio: 1,
-                    }}
-                  >
-                    <Image
-                      source={item.image}
-                      style={{ 
-                        width: '100%', 
-                        height: '100%',
-                      }}
-                      resizeMode="cover"
-                    />
-                  </View>
-
-                
-                  <TouchableOpacity
-                    className="bg-red-600 px-5 py-2 rounded-full self-center"
-                    onPress={() => router.push(`/menu/${item.id}`)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      className="text-white font-bold text-sm"
-                      style={{ fontFamily: Fonts.Urbanist.Medium }}
-                    >
-                      ORDER NOW
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               </View>
-            </Animatable.View>
-          ))}
-        </View>
-      </View>
+
+              {/* Category Items Grid */}
+              <Animatable.View
+                animation="fadeIn"
+                duration={400}
+                delay={categoryIndex * 100}
+                className="px-4"
+              >
+                <View className="flex-row flex-wrap" style={{ gap: 16 }}>
+                  {categoryData.items.map((item, index) => 
+                    renderMenuItem(item, index, cardWidth)
+                  )}
+                </View>
+              </Animatable.View>
+            </View>
+          );
+        })}
+      </Animatable.View>
     );
   };
 
-  
-  const renderBannerCarousel = () => {
+ const renderBannerCarousel = () => {
     const banner = carouselBanners[currentBannerIndex];
 
     const renderBannerText = () => {
@@ -480,94 +468,109 @@ export default function Home() {
 
     return (
       <View className="mb-6">
-        <Animatable.View
-          key={currentBannerIndex}
-          animation="fadeIn"
-          duration={600}
+        <View
+          className="self-center rounded-2xl overflow-hidden relative"
+          style={{ 
+            width: bannerWidth, 
+            height: bannerHeight,
+          }}
         >
-          <View
-            className="self-center rounded-2xl overflow-hidden relative"
+          {/* Background Image - home1 only */}
+          <ImageBackground
+            source={banner.image}
+            className="w-full h-full absolute"
+            resizeMode="cover"
+          />
+          
+          {/* Text and Button container with smooth fade and scale animation */}
+          <Animatable.View
+            key={`text-${currentBannerIndex}`}
+            animation={{
+              0: {
+                opacity: 0,
+                translateX: -30,
+                scale: 0.9,
+              },
+              1: {
+                opacity: 1,
+                translateX: 0,
+                scale: 1,
+              },
+            }}
+            duration={700}
+            easing="ease-out"
+            className="absolute z-10 justify-center"
             style={{ 
-              width: bannerWidth, 
-              height: bannerHeight,
-              backgroundColor: '#001801'
+              left: screenWidth * 0.04,
+              top: 0,
+              bottom: 0,
+              maxWidth: screenWidth * 0.45
             }}
           >
-            {/* Background Image */}
-            <ImageBackground
-              source={banner.image}
-              className="w-full h-full absolute"
-              resizeMode="cover"
-            >
-              <View 
-                className="absolute inset-0"
-                style={{ backgroundColor: 'rgba(0, 24, 1, 0.7)' }} 
-              />
-            </ImageBackground>
-            
-            {/* Text and Button container */}
-            <View 
-              className="absolute z-10"
+            {/* Discount */}
+            <Text 
+              className="font-bold uppercase italic"
               style={{ 
-                left: screenWidth * 0.04,
-                top: '50%',
-                transform: [{ translateY: -50 }],
-                maxWidth: screenWidth * 0.45
+                color: '#D42129',
+                fontSize: screenWidth * 0.06,
+                fontFamily: Fonts.Shrikhand,
+                letterSpacing: 0.72,
+                lineHeight: screenWidth * 0.07
               }}
             >
-              {/* Discount */}
+              {banner.discount}% OFF
+            </Text>
+            
+            {renderBannerText()}
+
+            <TouchableOpacity 
+              className="mt-3 self-start rounded-full px-4 py-2"
+              style={{ backgroundColor: '#D42129' }}
+              activeOpacity={0.8}
+            >
               <Text 
-                className="font-bold uppercase italic"
-                style={{ 
-                  color: '#D42129',
-                  fontSize: screenWidth * 0.06,
+                className="text-white text-sm font-bold uppercase"
+                style={{
                   fontFamily: Fonts.Shrikhand,
-                  letterSpacing: 0.72,
-                  lineHeight: screenWidth * 0.07
+                  letterSpacing: 0.42
                 }}
               >
-                {banner.discount}% OFF
+                Order Now
               </Text>
-              
-              {/* Description text */}
-              {renderBannerText()}
+            </TouchableOpacity>
+          </Animatable.View>
 
-              {/* Order Now Button */}
-              <TouchableOpacity 
-                className="mt-3 self-start rounded-full px-4 py-2"
-                style={{ backgroundColor: '#D42129' }}
-                activeOpacity={0.8}
-              >
-                <Text 
-                  className="text-white text-sm font-bold uppercase"
-                  style={{
-                    fontFamily: Fonts.Shrikhand,
-                    letterSpacing: 0.42
-                  }}
-                >
-                  Order Now
-                </Text>
-              </TouchableOpacity>
-            </View>
+          {/* Sub Image on the right side with smooth fade and scale animation */}
+          <Animatable.View
+            key={`image-${currentBannerIndex}`}
+            animation={{
+              0: {
+                opacity: 0,
+                translateX: 30,
+                scale: 0.85,
+              },
+              1: {
+                opacity: 1,
+                translateX: 0,
+                scale: 1,
+              },
+            }}
+            duration={700}
+            easing="ease-out"
+            className="absolute top-0 bottom-0 right-0 justify-center items-center z-0"
+            style={{
+              width: bannerWidth * 0.4,
+            }}
+          >
+            <Image
+              source={banner.subImage}
+              className="w-full h-full"
+              resizeMode="contain"
+            />
+          </Animatable.View>
+        </View>
 
-            {/* Sub Image on the right side */}
-            <View
-              className="absolute top-0 bottom-0 right-0 justify-center items-center z-0"
-              style={{
-                width: bannerWidth * 0.4,
-                backgroundColor: '#001801'
-              }}
-            >
-              <Image
-                source={banner.subImage}
-                className="w-full h-full"
-                resizeMode="contain"
-              />
-            </View>
-          </View>
-        </Animatable.View>
-
-        {/* Carousel Dots Indicator */}
+        {/* Carousel Indicators */}
         <View className="flex-row justify-center items-center mt-4 gap-2">
           {carouselBanners.map((_, index) => (
             <TouchableOpacity
@@ -588,13 +591,22 @@ export default function Home() {
   return (
     <SafeAreaView
       style={[
-        { backgroundColor: "#FFFFFF" },
+        { backgroundColor: "#F5F5F5" },
         Platform.OS === "android" && { paddingBottom: 55 },
         Platform.OS === "ios" && { paddingBottom: 20 },
       ]}
     >
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
+      <View 
+        className="flex-row items-center justify-between px-4 py-3 bg-white"
+        style={{
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 2,
+          elevation: 2,
+        }}
+      >
         {/* Location */}
         <View className="flex-row items-center flex-1">
           <Image
@@ -629,7 +641,17 @@ export default function Home() {
 
         {/* Menu Icon */}
         <View className="flex-1 items-end">
-          <TouchableOpacity className="bg-white p-2 rounded-xl shadow-md">
+          <TouchableOpacity 
+            onPress={openMenuDrawer}
+            className="bg-white p-2 rounded-xl"
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.08,
+              shadowRadius: 2,
+              elevation: 2,
+            }}
+          >
             <Image
               source={menuIcon}
               className="w-7 h-7"
@@ -647,8 +669,15 @@ export default function Home() {
             className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-xl ${
               orderType === 'pickup' 
                 ? 'bg-white border-2 border-red-600' 
-                : 'bg-gray-100'
+                : 'bg-white border border-gray-200'
             }`}
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.08,
+              shadowRadius: 2,
+              elevation: 2,
+            }}
             activeOpacity={0.8}
           >
             <Image
@@ -674,8 +703,15 @@ export default function Home() {
             className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-xl ${
               orderType === 'delivery'
                 ? 'bg-white border-2 border-red-600'
-                : 'bg-gray-100'
+                : 'bg-white border border-gray-200'
             }`}
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.08,
+              shadowRadius: 2,
+              elevation: 2,
+            }}
             activeOpacity={0.8}
           >
             <Image
@@ -731,65 +767,136 @@ export default function Home() {
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           />
 
-          {/* Featured Layout */}
-          {renderFeaturedLayout()}
-
-          {/* Empty State */}
-          {filteredMenuItems.length === 0 && (
-            <Animatable.View
-              key={`empty-${animationKey}`}
-              animation="fadeIn"
-              duration={300}
-              className="py-8 items-center"
-            >
-              <Text
-                className="text-gray-500"
-                style={{ fontFamily: Fonts.Poppins.Regular }}
-              >
-                No items in this category
-              </Text>
-            </Animatable.View>
-          )}
-        </View>
-
-        {/* Best Seller Section */}
-        <View className="mb-4">
-          <View className="px-4 mb-4 flex-row items-center justify-between">
-            <View>
-              <Text
-                className="text-2xl font-bold italic"
-                style={{ fontFamily: Fonts.Shrikhand, color: "#1F2937" }}
-              >
-                Best Seller
-              </Text>
-              <View className="mt-1 w-20 h-[3px] bg-[#CF2526] rounded-full" />
-            </View>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text
-                style={{
-                  fontFamily: Fonts.Poppins.SemiBold,
-                  fontWeight: '600',
-                  fontSize: 12,
-                  lineHeight: 12,
-                  letterSpacing: -0.24,
-                  textAlign: 'center',
-                  color: '#000000',
-                }}
-              >
-                See All
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {renderBestSellerItems()}
+          {/* Menu Display - Show all categories or specific category */}
+          {selectedCategory === 'all' 
+            ? renderAllCategoriesView() 
+            : renderCategoryMenuGrid()
+          }
         </View>
 
         {/* Bottom Padding */}
         <View className="h-[100px]" />
       </ScrollView>
 
+      {/* Menu Drawer Modal */}
+      <Modal
+        visible={menuDrawerVisible}
+        transparent={true}
+        animationType="none"
+        onRequestClose={closeMenuDrawer}
+      >
+        <TouchableOpacity 
+          activeOpacity={1}
+          onPress={closeMenuDrawer}
+          className="flex-1 bg-black/50"
+        >
+          <Animated.View
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: screenWidth * 0.75,
+              backgroundColor: '#FFFFFF',
+              transform: [{ translateX: slideAnim }],
+              shadowColor: '#000',
+              shadowOffset: { width: -2, height: 0 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 8,
+            }}
+            className="rounded-l-3xl"
+          >
+            <TouchableOpacity activeOpacity={1}>
+              <SafeAreaView className="flex-1">
+                {/* Drawer Header */}
+                <View className="px-6 py-4 border-b border-gray-200">
+                  <View className="flex-row items-center justify-between">
+                    <Text
+                      className="text-xl font-bold"
+                      style={{ fontFamily: Fonts.Shrikhand, color: '#1F2937' }}
+                    >
+                      Menu Categories
+                    </Text>
+                    <TouchableOpacity 
+                      onPress={closeMenuDrawer}
+                      className="p-2"
+                    >
+                      <Text className="text-2xl text-gray-600">×</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Categories List */}
+                <ScrollView className="flex-1 px-4 py-4">
+                  {categories.map((category, index) => (
+                    <Animatable.View
+                      key={category.id}
+                      animation="fadeInRight"
+                      duration={400}
+                      delay={index * 50}
+                    >
+                      <TouchableOpacity
+                        onPress={() => handleCategoryChange(category.id)}
+                        className={`py-4 px-5 mb-3 rounded-xl ${
+                          selectedCategory === category.id
+                            ? 'bg-red-600'
+                            : 'bg-gray-50'
+                        }`}
+                        style={{
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 1 },
+                          shadowOpacity: 0.05,
+                          shadowRadius: 2,
+                          elevation: 1,
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text
+                          className={`text-base font-semibold ${
+                            selectedCategory === category.id
+                              ? 'text-white'
+                              : 'text-gray-700'
+                          }`}
+                          style={{ fontFamily: Fonts.Poppins.SemiBold }}
+                        >
+                          {category.name}
+                        </Text>
+                      </TouchableOpacity>
+                    </Animatable.View>
+                  ))}
+                </ScrollView>
+
+                {/* Drawer Footer */}
+                <View className="px-6 py-4 border-t border-gray-200">
+                  <TouchableOpacity
+                    onPress={closeMenuDrawer}
+                    className="bg-red-600 py-3 rounded-full"
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      className="text-white text-center font-bold text-base"
+                      style={{ fontFamily: Fonts.Poppins.Bold }}
+                    >
+                      Close Menu
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </SafeAreaView>
+            </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+
       {loading && (
-        <View className="absolute inset-0 bg-white/80 items-center justify-center">
+        <View className="absolute inset-0 bg-white/90 items-center justify-center">
           <ActivityIndicator size="large" color="#DC2626" />
+          <Text 
+            className="mt-4 text-gray-600"
+            style={{ fontFamily: Fonts.Poppins.Medium }}
+          >
+            Loading menu...
+          </Text>
         </View>
       )}
     </SafeAreaView>
