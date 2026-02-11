@@ -1,16 +1,65 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Fonts } from "../../constants/Typography";
 import logo from "../../assets/images/logo.png";
+import { useState } from "react";
+import { forgotPassword } from "../../utils/api"; 
 
 export default function ForgotPassword() {
   const router = useRouter();
 
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Email validation
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Send Reset Link
+  const sendResetLink = async () => {
+    // Validation
+    if (!email.trim()) {
+      return Alert.alert("Error", "Please enter your email");
+    }
+
+    if (!isValidEmail(email.trim())) {
+      return Alert.alert("Error", "Please enter a valid email address");
+    }
+
+    if (loading) return; // Prevent double-click
+
+    try {
+      setLoading(true);
+
+      const data = await forgotPassword(email.trim());
+      
+      Alert.alert(
+        "Success ✅", 
+        data.msg || "Reset link sent! Check your email.",
+        [{ text: "OK" }]
+      );
+      
+    } catch (err) {
+      console.error("Forgot Password Error:", err);
+      
+      const errorMessage = 
+        err.msg || 
+        err.message || 
+        "Failed to send reset link. Please try again.";
+      
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white px-6">
       
-      {/* Logo – fixed at top */}
+      {/* Logo */}
       <View className="items-center mt-6 mb-10">
         <Image
           source={logo}
@@ -60,19 +109,31 @@ export default function ForgotPassword() {
           style={{ fontFamily: Fonts.Urbanist.Regular }}
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
+          value={email}
+          onChangeText={setEmail}
+          editable={!loading}
         />
 
-        {/* Button */}
-        <TouchableOpacity className="bg-[#D42129] py-4 rounded-2xl items-center">
-          <Text
-            style={{
-              fontFamily: Fonts.Poppins.Medium,
-              color: "#fff",
-              fontSize: 14,
-            }}
-          >
-            Send Reset Link
-          </Text>
+        {/* Send Button */}
+        <TouchableOpacity
+          onPress={sendResetLink}
+          disabled={loading}
+          className={`py-4 rounded-2xl items-center ${loading ? 'bg-[#D42129]/70' : 'bg-[#D42129]'}`}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text
+              style={{
+                fontFamily: Fonts.Poppins.Medium,
+                color: "#fff",
+                fontSize: 14,
+              }}
+            >
+              Send Reset Link
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* Resend */}
@@ -84,11 +145,13 @@ export default function ForgotPassword() {
               fontSize: 13,
             }}
           >
-            Didn’t receive any code?{" "}
+            Didn't receive any code?{" "}
             <Text
+              onPress={() => !loading && sendResetLink()}
               style={{
-                color: "#D42129",
+                color: loading ? "#D42129" : "#D42129",
                 fontFamily: Fonts.Poppins.Medium,
+                opacity: loading ? 0.5 : 1,
               }}
             >
               Resend
@@ -96,9 +159,10 @@ export default function ForgotPassword() {
           </Text>
         </View>
 
-        {/* Back */}
+        {/* Back to Sign In */}
         <TouchableOpacity
           onPress={() => router.back()}
+          disabled={loading}
           className="mt-8 items-center"
         >
           <Text
@@ -106,6 +170,7 @@ export default function ForgotPassword() {
               fontFamily: Fonts.Poppins.Regular,
               color: "#D42129",
               fontSize: 14,
+              opacity: loading ? 0.5 : 1,
             }}
           >
             Back to Sign In
