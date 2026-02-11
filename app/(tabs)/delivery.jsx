@@ -2117,7 +2117,7 @@ export default function Home() {
         <View className="items-center justify-center">
           <Image
             source={logo}
-            className="w-[50px] h-[60px]"
+             className="w-[80px] h-[90px]"
             resizeMode="contain"
           />
         </View>
@@ -2148,9 +2148,9 @@ export default function Home() {
         <View className="flex-row px-3 py-4 gap-3">
           <TouchableOpacity
             onPress={() => setOrderType('pickup')}
-            className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-xl ${
+            className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-full ${
               orderType === 'pickup' 
-                ? 'bg-white border-2 border-red-600' 
+                ? 'bg-white border-2 border-gray-50' 
                 : 'bg-white border border-gray-200'
             }`}
             style={{
@@ -2182,9 +2182,9 @@ export default function Home() {
               setOrderType('delivery');
               router.push("/delivery");
             }}
-            className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-xl ${
+            className={`flex-1 flex-row items-center justify-center py-3 px-4 rounded-full ${
               orderType === 'delivery'
-                ? 'bg-white border-2 border-red-600'
+                ? 'bg-white border-2 border-gray-50'
                 : 'bg-white border border-gray-200'
             }`}
             style={{
