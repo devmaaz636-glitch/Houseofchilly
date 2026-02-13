@@ -269,81 +269,112 @@ export default function MenuDetail() {
     >
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3">
-       <TouchableOpacity
-  onPress={() => router.back()}
-  className="bg-white rounded-full p-2 shadow-md"
->
-  <Ionicons name="chevron-back" size={22} color="#000" />
-</TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="bg-white rounded-full p-2 shadow-md"
+        >
+          <Ionicons name="chevron-back" size={22} color="#000" />
+        </TouchableOpacity>
 
+        <View className="items-center my-1">
+          <Text
+            className="text-[16px] text-center"
+            style={{
+              fontFamily: "Shrikhand",
+              fontStyle: "italic",
+              fontWeight: "800",
+              lineHeight: 30,
+              letterSpacing: -0.5,
+              includeFontPadding: false,
+              textAlignVertical: "center",
+            }}
+          >
+            Overview
+          </Text>
 
-       <View className="items-center my-1">
-  <Text
-    className="text-[16px] text-center"
-    style={{
-      fontFamily: "Shrikhand",
-      fontStyle: "italic",
-      fontWeight: "800",
-      lineHeight: 30,
-      letterSpacing: -0.5,
-      includeFontPadding: false,
-      textAlignVertical: "center",
-    }}
-  >
-    Overview
-  </Text>
-
-  {/* Underline */}
-  <View className="w-16 h-[2px] bg-[#CF2526] mt-1" />
-</View>
-
+          {/* Underline */}
+          <View className="w-16 h-[2px] bg-[#CF2526] mt-1" />
+        </View>
 
         <TouchableOpacity onPress={() => setCartVisible(true)}>
-  <View className="relative bg-white rounded-full p-2 shadow-md">
-    <Ionicons name="cart-outline" size={24} color="#000" />
+          <View className="relative bg-white rounded-full p-2 shadow-md">
+            <Ionicons name="cart-outline" size={24} color="#000" />
 
-    {getCartItemCount() > 0 && (
-      <View className="absolute -top-2 -right-2 bg-red-600 w-5 h-5 rounded-full items-center justify-center">
-        <Text className="text-white text-[10px] font-bold">
-          {getCartItemCount()}
-        </Text>
-      </View>
-    )}
-  </View>
-</TouchableOpacity>
-
+            {getCartItemCount() > 0 && (
+              <View className="absolute -top-2 -right-2 bg-red-600 w-5 h-5 rounded-full items-center justify-center">
+                <Text className="text-white text-[10px] font-bold">
+                  {getCartItemCount()}
+                </Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Image Carousel */}
-        <View style={{ width, height: 350 }} className="relative">
+        <View
+          style={{
+            width,
+            height: 350,
+            backgroundColor: "#F5F5F5",
+            borderRadius: 16,
+            overflow: "hidden",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Animatable.View
             key={currentImageIndex}
             animation="fadeIn"
             duration={600}
-            style={{ width: "100%", height: "100%" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
             <Image
               source={getImageSource()}
-              style={{ width: "100%", height: "100%", borderRadius: 16 }}
-              resizeMode="cover"
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              resizeMode="contain"
             />
           </Animatable.View>
 
           {hasMultipleImages && (
-            <View className="absolute bottom-4 left-0 right-0 flex-row justify-center items-center gap-2">
-              {menuItem.images.map((_, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => setCurrentImageIndex(index)}
-                  className="h-2 rounded"
-                  style={{
-                    width: index === currentImageIndex ? 24 : 8,
-                    backgroundColor: index === currentImageIndex ? '#D42129' : '#FFFFFF',
-                    opacity: index === currentImageIndex ? 1 : 0.6,
-                  }}
-                />
-              ))}
+            <View
+              style={{
+                position: "absolute",
+                bottom: 14,
+                left: 0,
+                right: 0,
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              {menuItem.images.map((_, index) => {
+                const active = index === currentImageIndex;
+
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => setCurrentImageIndex(index)}
+                    style={{
+                      height: 8,
+                      width: active ? 24 : 8,
+                      borderRadius: 10,
+                      backgroundColor: active ? "#D42129" : "#bbb",
+                      opacity: active ? 1 : 0.6,
+                    }}
+                  />
+                );
+              })}
             </View>
           )}
         </View>
@@ -352,8 +383,10 @@ export default function MenuDetail() {
           {/* Title + Price */}
           <View className="flex-row justify-between items-start mb-2">
             <Text
-              className="text-3xl font-bold flex-1 pr-2"
+              className="text-2xl font-bold flex-1 pr-2"
               style={{ fontFamily: Fonts.Urbanist.Medium }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
               {menuItem.name}
             </Text>
@@ -428,6 +461,8 @@ export default function MenuDetail() {
                       <Text 
                         className="text-xs font-semibold mt-2 text-center"
                         style={{ fontFamily: Fonts.Poppins.SemiBold }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
                       >
                         {item.name}
                       </Text>

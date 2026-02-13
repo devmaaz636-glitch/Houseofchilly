@@ -1701,13 +1701,15 @@ export default function Home() {
                     style={{
                       fontFamily: Fonts.Poppins.SemiBold,
                       fontWeight: '600',
-                      fontSize: 14,
-                      lineHeight: 18,
+                      fontSize: 13,
+                      lineHeight: 16,
                       color: '#000000',
                       textAlign: 'center',
                       marginBottom: 6,
+                      height: 16,
                     }}
-                    numberOfLines={2}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
                   >
                     {item.name}
                   </Text>
@@ -1806,13 +1808,15 @@ export default function Home() {
                     style={{
                       fontFamily: Fonts.Poppins.SemiBold,
                       fontWeight: '600',
-                      fontSize: 14,
-                      lineHeight: 18,
+                      fontSize: 13,
+                      lineHeight: 16,
                       color: '#000000',
                       textAlign: 'center',
                       marginBottom: 6,
+                      height: 16,
                     }}
-                    numberOfLines={2}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
                   >
                     {item.name}
                   </Text>
