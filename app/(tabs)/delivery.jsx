@@ -1145,10 +1145,6 @@ import deliveryicon from "../../assets/images/deliveryicon.png";
 import homesubimage from "../../assets/images/homesubimage.png";
 import homehandisubimage from "../../assets/images/homehandisubimage.png";
 import homerollsubimage from "../../assets/images/homerollsubimage.png";
-import bestselller1 from "../../assets/images/bestselller1.png";
-import bestselller2 from "../../assets/images/bestselller2.png";
-import bestselller3 from "../../assets/images/bestselller3.png";
-import bestselller4 from "../../assets/images/bestselller4.png"; 
 
 import { Fonts } from "../../constants/Typography";
 
@@ -1181,34 +1177,6 @@ const carouselBanners = [
     discount: "40",
     title: "Hot & Crispy",
     subtitle: "fried chicken"
-  }
-];
-
-// Best Seller static items
-const bestSellerItems = [
-  {
-    id: 'riyal-sindhi biryani',
-    name: 'Royal Sindhi Biryani',
-    price: '450',
-    image: bestselller1
-  },
-  {
-    id: 'hyderabadi-biryani',
-    name: 'Chilaman Biryani',
-    price: '550',
-    image: bestselller2
-  },
-  {
-    id: 'matka-prawn',
-    name: 'Matka Prawn Biryani',
-    price: '600',
-    image: bestselller3
-  },
-  {
-    id: 'beef-biryani',
-    name: 'Hyderabad Beef Biryani',
-    price: '400',
-    image: bestselller4
   }
 ];
 
@@ -1268,13 +1236,43 @@ export default function Home() {
     ? menuItemsData 
     : menuItemsData.filter(item => item.category === selectedCategory);
 
-  // Get limited items for Best Seller (only 4 if not showing all)
-  const displayedBestSellerItems = showAllBestSeller ? bestSellerItems : bestSellerItems.slice(0, 4);
+  // Get Best Seller items based on selected category
+  const getBestSellerItems = () => {
+    let itemsToShow;
+    
+    if (selectedCategory === 'all') {
+      // Show top items from biryani category when "All" is selected
+      itemsToShow = menuItemsData
+        .filter(item => item.category === 'biryani')
+        .slice(0, 4);
+    } else {
+      // Show items from the selected category
+      itemsToShow = menuItemsData
+        .filter(item => item.category === selectedCategory)
+        .slice(0, 4);
+    }
+
+    return itemsToShow;
+  };
+
+  const displayedBestSellerItems = showAllBestSeller 
+    ? getBestSellerItems() 
+    : getBestSellerItems().slice(0, 4);
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
     setAnimationKey(prev => prev + 1);
-    setShowAllMenu(false); // Reset to showing featured items when category changes
+    setShowAllMenu(false);
+    setShowAllBestSeller(false);
+  };
+
+  // Get category name for Best Seller heading
+  const getBestSellerCategoryName = () => {
+    if (selectedCategory === 'all') {
+      return 'Biryani';
+    }
+    const category = categories.find(cat => cat.id === selectedCategory);
+    return category ? category.name : 'Menu';
   };
 
   const renderCategory = ({ item }) => (
@@ -1302,8 +1300,8 @@ export default function Home() {
 
   // Render featured menu layout - 1 large on left, 2 stacked on right
   const renderFeaturedMenu = () => {
-    const leftCardWidth = (screenWidth - 40) * 0.52; // Increased from 0.48 to 0.52
-    const rightCardWidth = (screenWidth - 40) * 0.48; // Increased from 0.48, adjusted calculation
+    const leftCardWidth = (screenWidth - 40) * 0.52;
+    const rightCardWidth = (screenWidth - 40) * 0.48;
     const rightCardHeight = (leftCardWidth * 1.7) / 2 - 5;
 
     // Get first 3 items from filtered menu
@@ -1326,8 +1324,8 @@ export default function Home() {
     const rightTopItem = featuredItems[1];
     const rightBottomItem = featuredItems[2];
 
-    // Background images for the cards - first and third use home1, second uses different image
-    const bgImages = [menufirstimage, home1, menu2ndimage]; // You can change index 1 to a different image if needed
+    // Background images for the cards
+    const bgImages = [menufirstimage, home1, menu2ndimage];
 
     return (
       <Animatable.View
@@ -1348,7 +1346,7 @@ export default function Home() {
               activeOpacity={0.9}
               className="rounded-2xl overflow-hidden"
               style={{
-                height: leftCardWidth * 1.7, // Increased from 1.5 to 1.7
+                height: leftCardWidth * 1.7,
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.2,
@@ -1361,7 +1359,6 @@ export default function Home() {
                 className="w-full h-full"
                 resizeMode="cover"
               >
-                {/* Gradient Overlay for better text visibility */}
                 <View 
                   className="absolute inset-0"
                   style={{
@@ -1370,7 +1367,6 @@ export default function Home() {
                 />
                 
                 <View className="flex-1 p-4 justify-between items-center">
-                  {/* Item Info - Centered */}
                   <View className="w-full items-center">
                     <Text
                       style={{
@@ -1391,7 +1387,6 @@ export default function Home() {
                     </Text>
                   </View>
 
-                  {/* Food Image - Perfectly Centered with rotation animation */}
                   <Animatable.View 
                     animation={{
                       0: { opacity: 0, rotate: '-10deg', scale: 0.8 },
@@ -1413,7 +1408,6 @@ export default function Home() {
                     />
                   </Animatable.View>
 
-                  {/* Order Button - Centered with reduced width */}
                   <View className="w-full items-center">
                     <TouchableOpacity
                       className="bg-red-600 py-2 rounded-full"
@@ -1474,7 +1468,6 @@ export default function Home() {
                     className="w-full h-full"
                     resizeMode="cover"
                   >
-                    {/* Gradient Overlay */}
                     <View 
                       className="absolute inset-0"
                       style={{
@@ -1483,7 +1476,6 @@ export default function Home() {
                     />
                     
                     <View className="flex-1 p-3 justify-between items-center">
-                      {/* Item Info - Centered */}
                       <View className="w-full items-center">
                         <Text
                           style={{
@@ -1504,7 +1496,6 @@ export default function Home() {
                         </Text>
                       </View>
 
-                      {/* Food Image - Perfectly Centered with pulse animation */}
                       <Animatable.View 
                         animation={{
                           0: { opacity: 0, scale: 0.7 },
@@ -1526,7 +1517,6 @@ export default function Home() {
                         />
                       </Animatable.View>
 
-                      {/* Order Button - Centered with reduced width */}
                       <View className="w-full items-center">
                         <TouchableOpacity
                           className="bg-red-600 py-1.5 rounded-full"
@@ -1586,7 +1576,6 @@ export default function Home() {
                     className="w-full h-full"
                     resizeMode="cover"
                   >
-                    {/* Gradient Overlay */}
                     <View 
                       className="absolute inset-0"
                       style={{
@@ -1595,7 +1584,6 @@ export default function Home() {
                     />
                     
                     <View className="flex-1 p-3 justify-between items-center">
-                      {/* Item Info - Centered */}
                       <View className="w-full items-center">
                         <Text
                           style={{
@@ -1616,7 +1604,6 @@ export default function Home() {
                         </Text>
                       </View>
 
-                      {/* Food Image - Perfectly Centered with bounce animation */}
                       <Animatable.View 
                         animation={{
                           0: { opacity: 0, translateY: 20, scale: 0.8 },
@@ -1638,7 +1625,6 @@ export default function Home() {
                         />
                       </Animatable.View>
 
-                      {/* Order Button - Centered with reduced width */}
                       <View className="w-full items-center">
                         <TouchableOpacity
                           className="bg-red-600 py-1.5 rounded-full"
@@ -1692,7 +1678,7 @@ export default function Home() {
         <View className="flex-row flex-wrap" style={{ gap: 12 }}>
           {filteredMenuItems.map((item, index) => (
             <Animatable.View
-              key={item.id}
+              key={`menu-${item.id}-${index}`}
               animation="fadeInUp"
               duration={400}
               delay={index * 50}
@@ -1711,7 +1697,6 @@ export default function Home() {
                 }}
               >
                 <View className="p-4">
-                  {/* Item Name */}
                   <Text
                     style={{
                       fontFamily: Fonts.Poppins.SemiBold,
@@ -1727,7 +1712,6 @@ export default function Home() {
                     {item.name}
                   </Text>
 
-                  {/* Price */}
                   <Text
                     className="text-center text-[14px] font-semibold text-[#D42129] bg-[#D421291A] rounded-full px-3 py-[2px] self-center mb-3"
                     style={{ fontFamily: Fonts.Poppins.SemiBold }}
@@ -1735,7 +1719,6 @@ export default function Home() {
                     Rs. {item.price}
                   </Text>
 
-                  {/* Image - Centered with no background */}
                   <View 
                     className="items-center justify-center mb-4"
                     style={{
@@ -1753,7 +1736,6 @@ export default function Home() {
                     />
                   </View>
 
-                  {/* Order Button */}
                   <TouchableOpacity
                     className="bg-red-600 py-2.5 rounded-full"
                     onPress={(e) => {
@@ -1789,14 +1771,19 @@ export default function Home() {
   };
 
   const renderBestSellerItems = () => {
-    const cardWidth = (screenWidth - 36) / 2; // Matched to grid spacing
+    const cardWidth = (screenWidth - 36) / 2;
+    const bestSellers = displayedBestSellerItems;
+
+    if (bestSellers.length === 0) {
+      return null;
+    }
 
     return (
       <View className="px-3 mb-6">
         <View className="flex-row flex-wrap" style={{ gap: 12 }}>
-          {displayedBestSellerItems.map((item, index) => (
+          {bestSellers.map((item, index) => (
             <Animatable.View
-              key={item.id}
+              key={`bestseller-${item.id}-${index}`}
               animation="fadeIn"
               duration={400}
               delay={index * 50}
@@ -1815,7 +1802,6 @@ export default function Home() {
                 }}
               >
                 <View className="p-4">
-                  {/* Name */}
                   <Text
                     style={{
                       fontFamily: Fonts.Poppins.SemiBold,
@@ -1831,7 +1817,6 @@ export default function Home() {
                     {item.name}
                   </Text>
 
-                  {/* Price */}
                   <Text
                     className="text-center text-[14px] font-semibold text-[#D42129] bg-[#D421291A] rounded-full px-3 py-[2px] self-center mb-3"
                     style={{ fontFamily: Fonts.Poppins.SemiBold }}
@@ -1839,7 +1824,6 @@ export default function Home() {
                     Rs. {item.price}
                   </Text>
 
-                  {/* Image */}
                   <View 
                     className="items-center justify-center mb-4"
                     style={{
@@ -1848,7 +1832,7 @@ export default function Home() {
                     }}
                   >
                     <Image
-                      source={item.image}
+                      source={item.image || logo}
                       style={{ 
                         width: '90%', 
                         height: '90%',
@@ -1857,7 +1841,6 @@ export default function Home() {
                     />
                   </View>
 
-                  {/* Order Button */}
                   <TouchableOpacity
                     className="bg-red-600 py-2.5 rounded-full"
                     onPress={(e) => {
@@ -1958,14 +1941,12 @@ export default function Home() {
             height: bannerHeight,
           }}
         >
-          {/* Background Image - home1 only */}
           <ImageBackground
             source={banner.image}
             className="w-full h-full absolute"
             resizeMode="cover"
           />
           
-          {/* Text and Button container with smooth fade and scale animation */}
           <Animatable.View
             key={`text-${currentBannerIndex}`}
             animation={{
@@ -1990,7 +1971,6 @@ export default function Home() {
               maxWidth: screenWidth * 0.45
             }}
           >
-            {/* Discount */}
             <Text 
               className="font-bold uppercase italic"
               style={{ 
@@ -2023,7 +2003,6 @@ export default function Home() {
             </TouchableOpacity>
           </Animatable.View>
 
-          {/* Sub Image on the right side with smooth fade and scale animation */}
           <Animatable.View
             key={`image-${currentBannerIndex}`}
             animation={{
@@ -2053,7 +2032,6 @@ export default function Home() {
           </Animatable.View>
         </View>
 
-        {/* Carousel Indicators */}
         <View className="flex-row justify-center items-center mt-4 gap-2">
           {carouselBanners.map((_, index) => (
             <TouchableOpacity
@@ -2090,7 +2068,6 @@ export default function Home() {
           elevation: 3,
         }}
       >
-        {/* Location */}
         <View className="flex-row items-center flex-1">
           <Image
             source={homelocationicon}
@@ -2113,7 +2090,6 @@ export default function Home() {
           </View>
         </View>
 
-        {/* Logo - Centered */}
         <View className="items-center justify-center">
           <Image
             source={logo}
@@ -2122,7 +2098,6 @@ export default function Home() {
           />
         </View>
 
-        {/* Menu Icon */}
         <View className="flex-1 items-end">
           <TouchableOpacity 
             className="bg-white p-2 rounded-xl"
@@ -2261,7 +2236,6 @@ export default function Home() {
             )}
           </View>
           
-          {/* Categories */}
           <FlatList
             data={categories}
             renderItem={renderCategory}
@@ -2271,47 +2245,27 @@ export default function Home() {
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           />
 
-          {/* Menu Display - Featured layout or Full Grid */}
           {showAllMenu ? renderAllMenuGrid() : renderFeaturedMenu()}
         </View>
 
-        {/* Best Seller Section */}
-        <View className="mb-4">
-          <View className="px-3 mb-4 flex-row items-center justify-between">
-            <View>
-              <Text
-                className="text-2xl font-bold italic"
-                style={{ fontFamily: Fonts.Shrikhand, color: "#1F2937" }}
-              >
-                Best Seller
-              </Text>
-              <View className="mt-1 w-20 h-[3px] bg-[#CF2526] rounded-full" />
-            </View>
-            {bestSellerItems.length > 4 && (
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPress={() => setShowAllBestSeller(!showAllBestSeller)}
-              >
+        {/* Best Seller Section - Dynamic based on category */}
+        {displayedBestSellerItems.length > 0 && (
+          <View className="mb-4">
+            <View className="px-3 mb-4 flex-row items-center justify-between">
+              <View>
                 <Text
-                  style={{
-                    fontFamily: Fonts.Poppins.SemiBold,
-                    fontWeight: '600',
-                    fontSize: 12,
-                    lineHeight: 12,
-                    letterSpacing: -0.24,
-                    textAlign: 'center',
-                    color: '#D42129',
-                  }}
+                  className="text-2xl font-bold italic"
+                  style={{ fontFamily: Fonts.Shrikhand, color: "#1F2937" }}
                 >
-                  {showAllBestSeller ? 'Show Less' : 'See All'}
+                  Best {getBestSellerCategoryName()}
                 </Text>
-              </TouchableOpacity>
-            )}
+                <View className="mt-1 w-20 h-[3px] bg-[#CF2526] rounded-full" />
+              </View>
+            </View>
+            {renderBestSellerItems()}
           </View>
-          {renderBestSellerItems()}
-        </View>
+        )}
 
-        {/* Bottom Padding */}
         <View className="h-[100px]" />
       </ScrollView>
 

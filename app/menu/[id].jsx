@@ -294,7 +294,7 @@ export default function MenuDetail() {
   </Text>
 
   {/* Underline */}
-  <View className="w-16 h-[1px] bg-[#CF2526] mt-1" />
+  <View className="w-16 h-[2px] bg-[#CF2526] mt-1" />
 </View>
 
 
@@ -316,7 +316,7 @@ export default function MenuDetail() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Image Carousel */}
-        <View style={{ width, height: 320 }} className="relative">
+        <View style={{ width, height: 350 }} className="relative">
           <Animatable.View
             key={currentImageIndex}
             animation="fadeIn"
