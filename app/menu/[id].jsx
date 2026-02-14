@@ -20,6 +20,7 @@ import { Fonts } from "../../constants/Typography";
 import CartComponent from "../../components/restaurant/CartComponent";
 import { imageMap } from "../../utils/imageMap"; 
 import * as Animatable from "react-native-animatable";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get("window");
 
@@ -40,6 +41,7 @@ export default function MenuDetail() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSides, setSelectedSides] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { addToCart, getCartItemCount, isItemInCart, getItemQuantity } = useCart();
 
@@ -59,6 +61,54 @@ export default function MenuDetail() {
   useEffect(() => {
     loadMenuItem();
   }, [id]);
+
+  useEffect(() => {
+    if (menuItem) {
+      checkIfFavorite();
+    }
+  }, [menuItem]);
+
+  const checkIfFavorite = async () => {
+    try {
+      const favoritesJson = await AsyncStorage.getItem('favorites');
+      const favorites = favoritesJson ? JSON.parse(favoritesJson) : [];
+      const isFav = favorites.some(fav => String(fav.id) === String(menuItem.id));
+      setIsFavorite(isFav);
+    } catch (error) {
+      console.error('Error checking favorite:', error);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    try {
+      const favoritesJson = await AsyncStorage.getItem('favorites');
+      let favorites = favoritesJson ? JSON.parse(favoritesJson) : [];
+
+      if (isFavorite) {
+        // Remove from favorites
+        favorites = favorites.filter(fav => String(fav.id) !== String(menuItem.id));
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+        setIsFavorite(false);
+        Alert.alert('Removed from Favorites', `${menuItem.name} has been removed from your favorites`);
+      } else {
+        // Add to favorites
+        favorites.push({
+          id: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          image: menuItem.image,
+          images: menuItem.images,
+          description: menuItem.description,
+        });
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+        setIsFavorite(true);
+        Alert.alert('Added to Favorites', `${menuItem.name} has been added to your favorites`);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      Alert.alert('Error', 'Failed to update favorites');
+    }
+  };
 
   const loadMenuItem = async () => {
     try {
@@ -322,6 +372,7 @@ export default function MenuDetail() {
             overflow: "hidden",
             justifyContent: "center",
             alignItems: "center",
+            position: 'relative',
           }}
         >
           <Animatable.View
@@ -344,6 +395,33 @@ export default function MenuDetail() {
               resizeMode="contain"
             />
           </Animatable.View>
+
+          {/* Favorite Button */}
+          <TouchableOpacity
+            onPress={toggleFavorite}
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              backgroundColor: '#fff',
+              borderRadius: 50,
+              width: 44,
+              height: 44,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 5,
+            }}
+          >
+            <Ionicons 
+              name={isFavorite ? "heart" : "heart-outline"} 
+              size={24} 
+              color={isFavorite ? "#D42129" : "#666"} 
+            />
+          </TouchableOpacity>
 
           {hasMultipleImages && (
             <View
@@ -379,9 +457,17 @@ export default function MenuDetail() {
           )}
         </View>
 
-        <View className="px-4 py-6">
+        <View 
+          style={{
+            backgroundColor: "#fff",
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            paddingTop: 20,
+          }}
+          className="px-4 py-6"
+        >
           {/* Title + Price */}
-          <View className="flex-row justify-between items-start mb-2">
+          <View className="flex-row justify-between items-start mb-2 ">
             <Text
               className="text-2xl font-bold flex-1 pr-2"
               style={{ fontFamily: Fonts.Urbanist.Medium }}
